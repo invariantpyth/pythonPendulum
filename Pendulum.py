@@ -14,9 +14,8 @@ class Pendulum:
     time: float
     mass: float
     length: float
-    path: np.ndarray
 
-    def __init__(self, theta1, theta2, p1, p2, time, mass, length, path=np.zeros((500, 3))):
+    def __init__(self, theta1, theta2, p1, p2, time, mass, length):
         self.theta1 = theta1
         self.theta2 = theta2
         self.p1 = p1
@@ -24,7 +23,6 @@ class Pendulum:
         self.time = time
         self.mass = mass
         self.length = length
-        self.path = path
 
     # translators from angles between pendulum links and vertical line to cartesian coordinates
     def get_cartesian1(self) -> np.ndarray:
@@ -58,8 +56,7 @@ class Pendulum:
                      p2=self.p2,
                      time=self.time,
                      length=self.length,
-                     mass=self.mass,
-                     path=self.path)
+                     mass=self.mass)
         return p
 
     def corrector2(self):
@@ -69,35 +66,29 @@ class Pendulum:
                      p2=self.p2,
                      time=self.time,
                      length=self.length,
-                     mass=self.mass,
-                     path=self.path)
+                     mass=self.mass)
         return p
 
     def iterate(self):
         self.theta1 = (self.theta1 +
                        DT * (self.f1() + self.corrector1().f1()) / 2.0)
-        self.theta1 = self.theta1 - (self.theta1 // (2 * np.pi)) * (2 * np.pi)
+        # self.theta1 = self.theta1 - (self.theta1 // (2 * np.pi)) * (2 * np.pi)
 
         self.theta2 = (self.theta2 +
                        DT * (self.f2() + self.corrector2().f2()) / 2.0)
-        self.theta2 = self.theta2 - (self.theta2 // (2 * np.pi)) * (2 * np.pi)
+        # self.theta2 = self.theta2 - (self.theta2 // (2 * np.pi)) * (2 * np.pi)
 
         self.time += DT
 
-        dp1 = ((self.mass * self.length ** 2 / 2.0) *
+        dp1 = (-(self.mass * self.length ** 2 / 2.0) *
                (self.f1() * self.f2() * m.sin(self.theta1 - self.theta2) +
-                3.0 * G * m.sin(self.theta1) / self.length) * DT)
-        dp2 = ((self.mass * self.length ** 2 / 2.0) *
+                3.0 * G * m.sin(self.theta1) / self.length)) * DT
+        dp2 = (-(self.mass * self.length ** 2 / 2.0) *
                (-self.f1() * self.f2() * m.sin(self.theta1 - self.theta2) +
-                G * m.sin(self.theta1) / self.length) * DT)
+                G * m.sin(self.theta2) / self.length)) * DT
 
         self.p1 += dp1
 
         self.p2 += dp2
 
-        # add new coordinate to the end of the path array and removing the first coordinate
-        coord = self.get_cartesian2()
-        coord = np.array([coord[0], coord[1], 1], dtype=float)
-        coord.resize((1, 3))
-        self.path = np.append(self.path, coord, 0)
-        self.path = self.path[1:]
+

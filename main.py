@@ -15,14 +15,16 @@ PATH_COLOR = np.array([55.0, 102.0, 219.0])
 
 
 def main():
-    # theta1 = 2 * np.pi * rnd.random(),
-    # theta2 = 2 * np.pi * rnd.random()
-    pendulum = Pendulum(theta1=(np.pi / 2),
-                        theta2=(np.pi / 2),
-                        p1=0,
-                        p2=0,
+
+
+    # theta1 = (np.pi / 1),
+    # theta2 = (np.pi / 1),
+    pendulum = Pendulum(theta1=2 * np.pi * rnd.random(),
+                        theta2=2 * np.pi * rnd.random(),
+                        p1=1,
+                        p2=1,
                         time=0,
-                        mass=10,
+                        mass=1,
                         length=0.5)
     frame = Frame(width=WIDTH,
                   height=HEIGHT,
@@ -34,24 +36,27 @@ def main():
 
 
     # cv.imwrite('sample.png', frame.draw())
-    out = cv.VideoWriter('/home/maxim/Yandex.Disk/Фильмы/pendulum.mp4', cv.VideoWriter_fourcc('m', 'p', '4', 'v'), FPS, (WIDTH, HEIGHT))
+    out = cv.VideoWriter(f'/home/maxim/Yandex.Disk/Фильмы/pendulum_{pendulum.theta1}_{pendulum.theta2}_{pendulum.p1}_{pendulum.p2}.mp4', cv.VideoWriter_fourcc('m', 'p', '4', 'v'), FPS, (WIDTH, HEIGHT))
 
     percent = 0
     previous_percent = -1
     img = frame.draw()
     out.write(img)
-    for i in range(FPS * 60):
-        percent = int(100 * i / (FPS * 60))
+    frame_amount = FPS * 60 * 10
+    for i in range(frame_amount):
+        percent = int(100 * (i + 0.5) / frame_amount)
         if percent > previous_percent:
             print(f'{percent}% of the video is recorded')
             previous_percent = percent
-        frame.pendulum.iterate()
-        print(pendulum.theta1, pendulum.theta2, pendulum.p1, pendulum.p2)
+        frame.update()
+        # print(pendulum.theta1, pendulum.theta2, pendulum.p1, pendulum.p2)
         img = frame.draw()
         out.write(img)
 
     out.release()
 
+
+    print(f'{100}% of the video is recorded')
 
 if __name__ == '__main__':
     main()
