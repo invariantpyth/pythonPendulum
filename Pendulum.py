@@ -90,5 +90,3 @@ class Pendulum:
         self.p1 += dp1
 
         self.p2 += dp2
-
-

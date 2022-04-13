@@ -42,7 +42,7 @@ def main():
     previous_percent = -1
     img = frame.draw()
     out.write(img)
-    frame_amount = FPS * 60 * 10
+    frame_amount = FPS * 60 * 2
     for i in range(frame_amount):
         percent = int(100 * (i + 0.5) / frame_amount)
         if percent > previous_percent:
